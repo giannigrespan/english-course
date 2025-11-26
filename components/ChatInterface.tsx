@@ -33,11 +33,10 @@ const ChatInterface: React.FC = () => {
     setIsTyping(true);
 
     try {
-      // Prepare history for API (excluding the just added message for a sec, but actually api needs it)
-      // We map the current state messages + the new one
-      const history = [...messages, userMsg].map(m => ({ role: m.role, text: m.text }));
+      // Prepare history for API. The new message is sent via sendMessage, so we don't include it in history init.
+      const history = messages.map(m => ({ role: m.role, text: m.text }));
       
-      const replyText = await getChatReply(history, userMsg.text); // Note: technically verify format, but passing text directly usually works if chat initialized well. However, properly using chat history in service.
+      const replyText = await getChatReply(history, userMsg.text);
       
       const botMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
