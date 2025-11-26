@@ -18,6 +18,14 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
+      // Shim for process.env to prevent ReferenceError in browser environments
+      window.process = {
+        env: {
+          NODE_ENV: 'production',
+          API_KEY: '' // This acts as a placeholder; the real key is injected by the environment or bundler if available.
+        }
+      };
+
       tailwind.config = {
         theme: {
           extend: {
@@ -58,14 +66,20 @@
 {
   "imports": {
     "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
+    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
     "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0"
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
   }
 }
 </script>
 </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div style="height: 100vh; display: flex; align-items: center; justify-content: center; color: white; font-family: sans-serif;">
+        Loading App...
+      </div>
+    </div>
   </body>
 </html>

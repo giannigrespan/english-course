@@ -1,8 +1,6 @@
 import { GoogleGenAI, Type, Schema } from "@google/genai";
 import { LessonContent } from "../types";
 
-const apiKey = process.env.API_KEY;
-
 // Schema for structured lesson output
 const lessonSchema: Schema = {
   type: Type.OBJECT,
@@ -45,6 +43,7 @@ const lessonSchema: Schema = {
 };
 
 export const generateLesson = async (topicTitle: string): Promise<LessonContent> => {
+  const apiKey = process.env.API_KEY;
   if (!apiKey) throw new Error("API Key missing");
 
   const ai = new GoogleGenAI({ apiKey });
@@ -71,8 +70,11 @@ export const generateLesson = async (topicTitle: string): Promise<LessonContent>
       }
     });
 
-    const text = response.text;
+    let text = response.text;
     if (!text) throw new Error("No response from AI");
+    
+    // Clean potential markdown code blocks if the model outputs them despite mimeType
+    text = text.replace(/```json|```/g, '').trim();
     
     return JSON.parse(text) as LessonContent;
   } catch (error) {
@@ -88,7 +90,8 @@ export const generateLesson = async (topicTitle: string): Promise<LessonContent>
 };
 
 export const getChatReply = async (history: {role: 'user' | 'model', text: string}[], message: string): Promise<string> => {
-  if (!apiKey) throw new Error("API Key missing");
+  const apiKey = process.env.API_KEY;
+  if (!apiKey) return "Error: API Key missing.";
   
   const ai = new GoogleGenAI({ apiKey });
   
