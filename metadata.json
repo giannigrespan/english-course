@@ -1,0 +1,7 @@
+{
+  "name": "LinguaQuest: English Master",
+  "description": "An interactive, gamified English learning app tailored for middle school students (13yo). Features AI-generated lessons, quizzes, and chat practice.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
