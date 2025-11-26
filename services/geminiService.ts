@@ -43,10 +43,7 @@ const lessonSchema: Schema = {
 };
 
 export const generateLesson = async (topicTitle: string): Promise<LessonContent> => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) throw new Error("API Key missing");
-
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `You are an engaging English teacher for Italian middle school students (11-14 years old). 
   Create a lesson about "${topicTitle}".
@@ -79,21 +76,12 @@ export const generateLesson = async (topicTitle: string): Promise<LessonContent>
     return JSON.parse(text) as LessonContent;
   } catch (error) {
     console.error("Error generating lesson:", error);
-    return {
-      title: "Connection Error",
-      theory: "Impossibile contattare il professore AI al momento. Controlla la tua connessione o riprova più tardi.",
-      vocabulary: [],
-      examples: [],
-      quiz: []
-    };
+    throw error; // Re-throw to be handled by the UI
   }
 };
 
 export const getChatReply = async (history: {role: 'user' | 'model', text: string}[], message: string): Promise<string> => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) return "Error: API Key missing.";
-  
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const chat = ai.chats.create({
     model: 'gemini-2.5-flash',

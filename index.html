@@ -18,33 +18,13 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
-      // Global error handler to see issues on mobile/deployment
+      // Global error handler
       window.onerror = function(msg, url, line, col, error) {
-        // Ignore resize observer loop limit errors
         if(msg.includes('ResizeObserver')) return false;
-        
-        const root = document.getElementById('root');
-        if(root) {
-           // Only show if app hasn't loaded
-           if(root.innerText === 'Loading App...') {
-              root.innerHTML = `<div style="padding:20px; color: #fca5a5; font-family: monospace;">
-                <strong>Error starting app:</strong><br/>
-                ${msg}<br/>
-                <small>${url}:${line}</small>
-              </div>`;
-           }
-        }
         return false;
       };
 
-      // Shim for process.env
-      window.process = {
-        env: {
-          NODE_ENV: 'production',
-          API_KEY: '' 
-        }
-      };
-
+      // Tailwind Config
       tailwind.config = {
         theme: {
           extend: {
@@ -90,15 +70,15 @@
           scrollbar-width: none;
       }
     </style>
-  <script type="importmap">
+<script type="importmap">
 {
   "imports": {
-    "react": "https://aistudiocdn.com/react@^19.2.0",
-    "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
-    "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
     "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/"
+    "react/": "https://aistudiocdn.com/react@^19.2.0/",
+    "react": "https://aistudiocdn.com/react@^19.2.0",
+    "vite": "https://aistudiocdn.com/vite@^7.2.4",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
   }
 }
 </script>
@@ -111,7 +91,6 @@
         <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
       </div>
     </div>
-    <!-- CRITICAL: Entry point script -->
     <script type="module" src="./index.tsx"></script>
   </body>
 </html>

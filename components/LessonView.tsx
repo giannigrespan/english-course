@@ -32,7 +32,7 @@ const LessonView: React.FC<LessonViewProps> = ({ topic, onComplete, onBack }) =>
         if (isMounted) {
             setLoading(false);
             if (e.message?.includes('API Key')) {
-                setErrorMsg("API Key mancante. Se sei su Vercel, imposta la variabile d'ambiente 'API_KEY'.");
+                setErrorMsg("API Key mancante. Su Vercel, rinomina la variabile in 'VITE_API_KEY' o 'REACT_APP_API_KEY'.");
             } else {
                 setErrorMsg("Impossibile generare la lezione. Riprova più tardi.");
             }
@@ -67,7 +67,7 @@ const LessonView: React.FC<LessonViewProps> = ({ topic, onComplete, onBack }) =>
       return (
           <div className="flex flex-col items-center justify-center h-[60vh] p-8 text-center">
             <div className="text-6xl mb-4">⚠️</div>
-            <h2 className="text-xl font-bold text-red-400 mb-2">Errore</h2>
+            <h2 className="text-xl font-bold text-red-400 mb-2">Errore Configurazione</h2>
             <p className="text-slate-300 mb-6 max-w-md">{errorMsg || "Si è verificato un errore imprevisto."}</p>
             <button onClick={onBack} className="px-6 py-2 bg-slate-700 rounded-lg text-white hover:bg-slate-600">
                 Torna Indietro
