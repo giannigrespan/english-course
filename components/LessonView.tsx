@@ -16,6 +16,7 @@ const LessonView: React.FC<LessonViewProps> = ({ topic, onComplete, onBack }) =>
   const [score, setScore] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [showExplanation, setShowExplanation] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -26,9 +27,16 @@ const LessonView: React.FC<LessonViewProps> = ({ topic, onComplete, onBack }) =>
           setContent(data);
           setLoading(false);
         }
-      } catch (e) {
+      } catch (e: any) {
         console.error(e);
-        if (isMounted) setLoading(false);
+        if (isMounted) {
+            setLoading(false);
+            if (e.message?.includes('API Key')) {
+                setErrorMsg("API Key mancante. Se sei su Vercel, imposta la variabile d'ambiente 'API_KEY'.");
+            } else {
+                setErrorMsg("Impossibile generare la lezione. Riprova più tardi.");
+            }
+        }
       }
     };
     fetchLesson();
@@ -37,11 +45,10 @@ const LessonView: React.FC<LessonViewProps> = ({ topic, onComplete, onBack }) =>
 
   const speakText = (text: string) => {
     if ('speechSynthesis' in window) {
-      // Remove text in parentheses for cleaner audio if present (often translations)
       const cleanText = text.replace(/\s*\(.*?\)\s*/g, '');
       const utterance = new SpeechSynthesisUtterance(cleanText);
-      utterance.lang = 'en-US'; // English US
-      utterance.rate = 0.9; // Slightly slower for students
+      utterance.lang = 'en-US';
+      utterance.rate = 0.9;
       window.speechSynthesis.speak(utterance);
     }
   };
@@ -56,17 +63,28 @@ const LessonView: React.FC<LessonViewProps> = ({ topic, onComplete, onBack }) =>
     );
   }
 
-  if (!content) return <div className="p-8 text-center text-red-400">Errore nel caricamento.</div>;
+  if (errorMsg || !content) {
+      return (
+          <div className="flex flex-col items-center justify-center h-[60vh] p-8 text-center">
+            <div className="text-6xl mb-4">⚠️</div>
+            <h2 className="text-xl font-bold text-red-400 mb-2">Errore</h2>
+            <p className="text-slate-300 mb-6 max-w-md">{errorMsg || "Si è verificato un errore imprevisto."}</p>
+            <button onClick={onBack} className="px-6 py-2 bg-slate-700 rounded-lg text-white hover:bg-slate-600">
+                Torna Indietro
+            </button>
+          </div>
+      )
+  }
 
   // THEORY VIEW
   if (currentStep === 'theory') {
     return (
-      <div className="max-w-3xl mx-auto pb-20">
+      <div className="max-w-3xl mx-auto pb-20 animate-fade-in">
         <button onClick={onBack} className="text-slate-400 hover:text-white mb-4 flex items-center gap-2 transition-colors">
           ← Torna alla Dashboard
         </button>
         
-        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6">
+        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary mb-6 leading-tight">
           {content.title}
         </h1>
         
@@ -88,7 +106,7 @@ const LessonView: React.FC<LessonViewProps> = ({ topic, onComplete, onBack }) =>
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {content.vocabulary.map((item, idx) => (
-                <div key={idx} className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-col gap-2">
+                <div key={idx} className="bg-slate-800 p-4 rounded-xl border border-slate-700 flex flex-col gap-2 shadow-sm hover:border-slate-600 transition-colors">
                   <div className="flex justify-between items-center">
                     <span className="font-bold text-white text-lg">{item.word}</span>
                     <button 
@@ -162,7 +180,11 @@ const LessonView: React.FC<LessonViewProps> = ({ topic, onComplete, onBack }) =>
     };
 
     return (
-      <div className="max-w-2xl mx-auto flex flex-col justify-center min-h-[500px]">
+      <div className="max-w-2xl mx-auto flex flex-col justify-center min-h-[500px] animate-fade-in">
+        <button onClick={onBack} className="text-slate-500 hover:text-slate-300 mb-6 text-sm">
+           Esci dal quiz
+        </button>
+
         {/* Progress Bar */}
         <div className="w-full bg-slate-800 h-2 rounded-full mb-8 overflow-hidden">
           <div 
@@ -233,7 +255,7 @@ const LessonView: React.FC<LessonViewProps> = ({ topic, onComplete, onBack }) =>
   // RESULTS VIEW
   return (
     <div className="flex flex-col items-center justify-center h-full p-8 text-center max-w-lg mx-auto animate-fade-in">
-      <div className="text-8xl mb-6 filter drop-shadow-2xl">
+      <div className="text-8xl mb-6 filter drop-shadow-2xl animate-bounce">
         {score === content.quiz.length ? '🥇' : score >= content.quiz.length / 2 ? '🥈' : '🥉'}
       </div>
       <h2 className="text-4xl font-extrabold text-white mb-4">

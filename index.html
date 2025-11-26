@@ -18,11 +18,30 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
-      // Shim for process.env to prevent ReferenceError in browser environments
+      // Global error handler to see issues on mobile/deployment
+      window.onerror = function(msg, url, line, col, error) {
+        // Ignore resize observer loop limit errors
+        if(msg.includes('ResizeObserver')) return false;
+        
+        const root = document.getElementById('root');
+        if(root) {
+           // Only show if app hasn't loaded
+           if(root.innerText === 'Loading App...') {
+              root.innerHTML = `<div style="padding:20px; color: #fca5a5; font-family: monospace;">
+                <strong>Error starting app:</strong><br/>
+                ${msg}<br/>
+                <small>${url}:${line}</small>
+              </div>`;
+           }
+        }
+        return false;
+      };
+
+      // Shim for process.env
       window.process = {
         env: {
           NODE_ENV: 'production',
-          API_KEY: '' // This acts as a placeholder; the real key is injected by the environment or bundler if available.
+          API_KEY: '' 
         }
       };
 
@@ -37,6 +56,20 @@
               secondary: '#ec4899', // Pink 500
               accent: '#14b8a6', // Teal 500
               dark: '#0f172a', // Slate 900
+            },
+            animation: {
+              'fade-in': 'fadeIn 0.5s ease-out',
+              'fade-in-up': 'fadeInUp 0.5s ease-out',
+            },
+            keyframes: {
+              fadeIn: {
+                '0%': { opacity: '0' },
+                '100%': { opacity: '1' },
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' },
+              }
             }
           }
         }
@@ -46,20 +79,15 @@
       body {
         background-color: #0f172a;
         color: #f8fafc;
-        /* Prevent pull-to-refresh on mobile for app-like feel */
         overscroll-behavior-y: none;
+        -webkit-tap-highlight-color: transparent;
       }
-      /* Custom scrollbar for chat */
       .scrollbar-hide::-webkit-scrollbar {
           display: none;
       }
       .scrollbar-hide {
           -ms-overflow-style: none;
           scrollbar-width: none;
-      }
-      /* Safe area padding for notched phones */
-      .safe-pb {
-        padding-bottom: env(safe-area-inset-bottom);
       }
     </style>
   <script type="importmap">
@@ -68,18 +96,22 @@
     "react": "https://aistudiocdn.com/react@^19.2.0",
     "react-dom/client": "https://aistudiocdn.com/react-dom@^19.2.0/client",
     "react-dom": "https://aistudiocdn.com/react-dom@^19.2.0",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
     "@google/genai": "https://aistudiocdn.com/@google/genai@^1.30.0",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
+    "react/": "https://aistudiocdn.com/react@^19.2.0/"
   }
 }
 </script>
 </head>
   <body>
     <div id="root">
-      <div style="height: 100vh; display: flex; align-items: center; justify-content: center; color: white; font-family: sans-serif;">
-        Loading App...
+      <div style="height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; font-family: sans-serif;">
+        <div style="width: 40px; height: 40px; border: 4px solid #6366f1; border-top-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px;"></div>
+        Loading LinguaQuest...
+        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
       </div>
     </div>
+    <!-- CRITICAL: Entry point script -->
+    <script type="module" src="./index.tsx"></script>
   </body>
 </html>
